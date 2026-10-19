@@ -1,4 +1,4 @@
-# GridGameCaravan — a traversal lab for the walking town (separate repo)
+# TownWalker — a traversal lab for the walking town (separate repo)
 
 ## Context
 
@@ -13,7 +13,7 @@ The owner's direction (2026-10-10):
   - hex grid feels turn-based;
   - isometric would be amazing but there's no art;
   - full 3D would be best if assets allow.
-- The owner wants **several working demos** of traversal methods, built in a **separate Unity project** (new repo `https://github.com/mindattic/GridGameCaravan`) so the idea doesn't leak into GridGameGaiden yet.
+- The owner wants **several working demos** of traversal methods, built in a **separate Unity project** (new repo `https://github.com/mindattic/TownWalker`) so the idea doesn't leak into GridGameGaiden yet.
 
 **Out of scope (owner's answers):**
 - No changes to GridGameGaiden, its bible or its systems.
@@ -34,7 +34,7 @@ The owner's direction (2026-10-10):
 
 ## Project setup (the new repo)
 
-- Clone `mindattic/GridGameCaravan` to `D:\Projects\MindAttic\GridGameCaravan`.
+- Clone `mindattic/TownWalker` to `D:\Projects\MindAttic\TownWalker`.
 - Create a Unity **6000.4.3f1** project there in batchmode (`-createProject`, URP).
 - Use the same code-only conventions as Gaiden: one bootstrap scene, everything built in C#, UI Toolkit HUD, Git LFS for binaries.
 - Copy, don't link, the small reusable bits from Gaiden:

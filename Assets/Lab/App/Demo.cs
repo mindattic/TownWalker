@@ -248,7 +248,7 @@ namespace Lab.App
             }
             ride.RemoveFromHierarchy();
 
-            // Placeholder battle: GridGameGaiden's battle screen plugs in here (waves, then the boss).
+            // Placeholder battle: waves, then the boss.
             L.BeginBattle();
             var card = Ui.Window(App.Overlay);
             card.name = "battle-card";
@@ -256,7 +256,7 @@ namespace Lab.App
             Ui.Text("⚔ BATTLE", "h1", card).style.unityTextAlign = TextAnchor.MiddleCenter;
             var line = Ui.Text("", "h2", card);
             line.style.unityTextAlign = TextAnchor.MiddleCenter;
-            Ui.Text("(placeholder — the real game plays a GridGameGaiden battle here)", "tiny dim", card).style.unityTextAlign = TextAnchor.MiddleCenter;
+            Ui.Text("(placeholder battle)", "tiny dim", card).style.unityTextAlign = TextAnchor.MiddleCenter;
             int total = ex.Site.Waves + (ex.Site.HasBoss ? 1 : 0);
             for (int i = 0; i < total; i++)
             {

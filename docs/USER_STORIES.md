@@ -37,6 +37,7 @@ _Nothing recorded yet._
 | GGC-T14 | 2026-10-16 | docs | closed | Update USER_STORIES.md | — |
 | GGC-T15 | 2026-10-17 | feature | closed | Walker rig: per-leg terrain contact, flat stomping hooves, slow turn-in-place, and a chamfered hull base, so the isometric town reads as a heavy quadruped instead of developer art | manual play test, Isometric Expanse |
 | GGC-T16 | 2026-10-18 | chore | closed | Add deploy.bat and project-owned /deploy, /run commands wrapping tools/deploy.ps1 so they run without a workflow ticket or pace-gate hold | — |
-| GGC-T17 | 2026-10-19 | chore | open | Back up the Walking Town Traversal Claude artifact into artifacts/ per HOUSE-LAW-12 | — |
+| GGC-T17 | 2026-10-19 | chore | closed | Back up the Walking Town Traversal Claude artifact into artifacts/ per HOUSE-LAW-12 | GridGameCaravan (7f8948b) |
 | GGC-T18 | 2026-10-19 | feature | closed | Spider Town demo: the iso expanse walked by a radially symmetric spider town on 3-6 insect (/\) legs, rigid-body + spring-leg physics, a free gait with a static-stability check (tripod lurch, crawl, wave, alternating tripod), feet planting on every terrain step | — |
 | GGC-T19 | 2026-10-19 | feature | closed | The cow walker's hull rides on simulated spring legs (rigid-body lift/roll/pitch) instead of a scripted bob/tilt, and in the iso expanse it turns in place to face its destination before it sets off | — |
+| GGC-T20 | 2026-10-19 | chore | closed | Rename GridGameCaravan to TownWalker (owner 2026-10-19): it is now a standalone project, not GridGameGaiden's traversal lab. Product name, exe, deploy folder and shortcut, tools, docs and comments renamed; GitHub repo renamed; workflow repo key renamed; the owner renames the Windows folder. | — |

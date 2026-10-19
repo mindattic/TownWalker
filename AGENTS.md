@@ -1,11 +1,12 @@
-# GridGame Caravan — agent entrypoint
+# TownWalker — agent entrypoint
 
 Read the shared protocol at ..\mindattic-agent-standard\AGENTS.md, then this file and README.md.
 
 ## What this is
-A separate Unity 6 (6000.4.3f1) traversal lab: prototyping how the walking town crosses the
-surface before anything is folded into GridGameGaiden. See README.md for the premise and the five
-traversal demos (Route Map, Horizon Strip, Isometric Expanse, 3D Low-Poly Walker, Radar Sectors).
+TownWalker (formerly GridGameCaravan) is a standalone Unity 6 (6000.4.3f1) project about walking towns
+crossing the surface. It began as GridGameGaiden's traversal lab and is now its own entity: nothing here
+is destined for Gaiden, which has no world map. See README.md for the premise and the demos (Route Map,
+Horizon Strip, Isometric Expanse, Spider Town, 3D Low-Poly Walker, Radar Sectors).
 
 ## Laws (do not break)
 1. **Shared core, comparable demos.** Every demo plays the same `Lab.Core` loop (scan → choose a
@@ -21,14 +22,14 @@ traversal demos (Route Map, Horizon Strip, Isometric Expanse, 3D Low-Poly Walker
 
 ## Build, run and check
 ```
-powershell -File tools/build.ps1                       # Windows dev build -> Build/Windows/GridGameCaravan.exe
+powershell -File tools/build.ps1                       # Windows dev build -> Build/Windows/TownWalker.exe
 python tools/labcheck.py [demo ...]                    # plays each demo's loop, screenshots -> artifacts/labcheck
 dotnet test Tests/Core.Tests                           # the engine-free core (world, town, routing, hex)
 python tools/make_lab_icons.py                         # pixel icons (game-icons.net, CC BY 3.0)
-deploy.bat  /  powershell -File tools/deploy.ps1        # release build -> publish to C:\Apps\GridGameCaravan, refresh Desktop shortcut
+deploy.bat  /  powershell -File tools/deploy.ps1        # release build -> publish to C:\Apps\TownWalker, refresh Desktop shortcut
 ```
 `/deploy` and `/run` are project-owned commands (`.claude/commands/`) that run `tools/deploy.ps1`
-and launch `C:\Apps\GridGameCaravan\GridGameCaravan.exe` directly — mechanical utilities, not
+and launch `C:\Apps\TownWalker\TownWalker.exe` directly — mechanical utilities, not
 project work, so they run instantly with no ticket or pace-gate hold.
 
 ## Map

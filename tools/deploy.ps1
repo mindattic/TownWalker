@@ -1,25 +1,25 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Shuts down any running GridGameCaravan, clears the release build output, rebuilds the Windows
+    Shuts down any running TownWalker, clears the release build output, rebuilds the Windows
     release player (Lab.EditorTools.LabBuild.BuildWindowsRelease), and publishes a standalone copy
-    to C:\Apps\GridGameCaravan\ — same process UnityEve/UnitySolarSystem/Automata/KdpPublish/
+    to C:\Apps\TownWalker\ — same process UnityEve/UnitySolarSystem/Automata/KdpPublish/
     IdiotProof use to always have a fresh, independent deployed copy instead of a possibly-stale
     dev build.
 
 .DESCRIPTION
-    1. Stops any running GridGameCaravan.exe process (dev copy or deployed copy).
+    1. Stops any running TownWalker.exe process (dev copy or deployed copy).
     2. Removes Build\WindowsRelease — the build OUTPUT only, never Library\ (Unity's asset
        import / script-compile cache, which survives exactly as it does for a normal Editor
        rebuild) — so the player build below is never a stale incremental copy.
     3. Runs Unity in batch mode via tools\unity.ps1 (-executeMethod
        Lab.EditorTools.LabBuild.BuildWindowsRelease, requires the Editor closed)
-       -> Build\WindowsRelease\GridGameCaravan.exe.
-    4. Copies Build\WindowsRelease\* -> C:\Apps\GridGameCaravan\.
+       -> Build\WindowsRelease\TownWalker.exe.
+    4. Copies Build\WindowsRelease\* -> C:\Apps\TownWalker\.
     5. Writes/refreshes a Desktop shortcut pointing at the deployed exe.
 
 .PARAMETER Launch
-    After publishing, immediately run the deployed GridGameCaravan.exe.
+    After publishing, immediately run the deployed TownWalker.exe.
 
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File tools\deploy.ps1
@@ -30,15 +30,15 @@ param([switch]$Launch)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$repoDir  = Split-Path $PSScriptRoot   # tools\ -> GridGameCaravan\
-$out      = 'C:\Apps\GridGameCaravan'
-$exeName  = 'GridGameCaravan.exe'
+$repoDir  = Split-Path $PSScriptRoot   # tools\ -> TownWalker\
+$out      = 'C:\Apps\TownWalker'
+$exeName  = 'TownWalker.exe'
 $buildDir = Join-Path $repoDir 'Build\WindowsRelease'
 
 # ── Stop running instance ──────────────────────────────────────────────────
 Write-Host ''
 Write-Host '  Stopping running instance...' -ForegroundColor Yellow
-$procs = Get-Process 'GridGameCaravan' -ErrorAction SilentlyContinue
+$procs = Get-Process 'TownWalker' -ErrorAction SilentlyContinue
 if ($procs) {
     $procs | Stop-Process -Force
     Write-Host "    Stopped ($(@($procs).Count) process(es))" -ForegroundColor DarkYellow
@@ -89,12 +89,12 @@ if (-not (Test-Path $exe)) {
 # ── Desktop shortcut ─────────────────────────────────────────────────────────
 # Points at the published copy, so double-clicking it (or /run) always plays the last deploy.
 # GetFolderPath, not $HOME\Desktop: OneDrive may have moved the Desktop folder.
-$shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'GridGame Caravan.lnk'
+$shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'TownWalker.lnk'
 $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
 $link.TargetPath       = $exe
 $link.WorkingDirectory = $out
 $link.IconLocation     = "$exe,0"
-$link.Description      = 'GridGame Caravan (deployed copy in C:\Apps)'
+$link.Description      = 'TownWalker (deployed copy in C:\Apps)'
 $link.Save()
 Write-Host "    Shortcut -> $shortcut" -ForegroundColor Gray
 

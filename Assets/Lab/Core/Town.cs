@@ -120,7 +120,7 @@ namespace Lab.Core
             return Current;
         }
 
-        /// <summary>The placeholder battle starts (in the real game Gaiden's battle screen plugs in here).</summary>
+        /// <summary>The placeholder battle starts.</summary>
         public void BeginBattle()
         {
             Phase = LoopPhase.Battle;

@@ -18,7 +18,7 @@ namespace Lab.App
             Ui.Fill(col);
             col.style.paddingTop = 90; col.style.paddingLeft = col.style.paddingRight = 40;
 
-            var title = Ui.Text("GridGame Caravan", "title shadow", col);
+            var title = Ui.Text("TownWalker", "title shadow", col);
             Fonts.UseDisplay(title);
             title.style.fontSize = 96;
             var sub = Ui.Text("Traversal lab — how does the walking town cross the surface?", "small shadow", col);

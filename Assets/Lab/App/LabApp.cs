@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 namespace Lab.App
 {
     /// <summary>
-    /// GridGameCaravan traversal lab (owner direction 2026-10-10): several ways for the walking town to cross the
+    /// TownWalker traversal lab (owner direction 2026-10-10): several ways for the walking town to cross the
     /// surface, each a playable proof of concept of the same loop. Built entirely in code like GridGameGaiden: the
     /// scene is an empty shell, the UI is a 1170×2532 UI Toolkit stage, the 3D demo renders to the camera beneath it.
     /// </summary>

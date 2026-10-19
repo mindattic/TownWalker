@@ -20,7 +20,7 @@ namespace Lab.EditorTools
                 EditorSceneManager.SaveScene(scene, ScenePath);
             }
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
-            PlayerSettings.productName = "GridGame Caravan Lab";
+            PlayerSettings.productName = "TownWalker";
             PlayerSettings.companyName = "MindAttic";
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.SplashScreen.show = false;
@@ -34,9 +34,9 @@ namespace Lab.EditorTools
 
         public static void CompileCheck() { EnsureScene(); Debug.Log("[Build] compile ok"); if (Application.isBatchMode) EditorApplication.Exit(0); }
 
-        public static void BuildWindowsDev() => Build(BuildTarget.StandaloneWindows64, "Build/Windows/GridGameCaravan.exe", true);
+        public static void BuildWindowsDev() => Build(BuildTarget.StandaloneWindows64, "Build/Windows/TownWalker.exe", true);
 
-        public static void BuildWindowsRelease() => Build(BuildTarget.StandaloneWindows64, "Build/WindowsRelease/GridGameCaravan.exe", false);
+        public static void BuildWindowsRelease() => Build(BuildTarget.StandaloneWindows64, "Build/WindowsRelease/TownWalker.exe", false);
 
         public static void BuildWebGL()
         {

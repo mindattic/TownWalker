@@ -11,8 +11,8 @@ $root = Split-Path -Parent $PSScriptRoot
 $ver = (Select-String -Path "$root/ProjectSettings/ProjectVersion.txt" -Pattern "m_EditorVersion: (.+)").Matches[0].Groups[1].Value.Trim()
 $unity = "C:\Program Files\Unity\Hub\Editor\$ver\Editor\Unity.exe"
 if (-not (Test-Path $unity)) { throw "Unity $ver not installed at $unity" }
-if (Get-Process -Name Unity -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*GridGameCaravan*" }) {
-    throw "GridGameCaravan is open in the Unity Editor. Close it (File > Quit) and re-run."
+if (Get-Process -Name Unity -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like "*TownWalker*" }) {
+    throw "TownWalker is open in the Unity Editor. Close it (File > Quit) and re-run."
 }
 New-Item -ItemType Directory -Force "$root/Logs" | Out-Null
 $logFile = "$root/Logs/$Log.log"

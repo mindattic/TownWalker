@@ -17,7 +17,7 @@ import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXE = os.path.join(ROOT, "Build", "Windows", "GridGameCaravan.exe")
+EXE = os.path.join(ROOT, "Build", "Windows", "TownWalker.exe")
 PORT = 7777
 BASE = f"http://127.0.0.1:{PORT}"
 
