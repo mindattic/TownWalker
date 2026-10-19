@@ -36,3 +36,4 @@ _Nothing recorded yet._
 | GGC-T13 | 2026-10-16 | docs | open | Bring README.md up to date with the code as it is now (what it is, setup, usage, commands, current state), following codex-standard/README-STYLE.md; README.htm regenerated if the repo has one | user request 2026-10-16: approved repo sweep |
 | GGC-T14 | 2026-10-16 | docs | closed | Update USER_STORIES.md | — |
 | GGC-T15 | 2026-10-17 | feature | closed | Walker rig: per-leg terrain contact, flat stomping hooves, slow turn-in-place, and a chamfered hull base, so the isometric town reads as a heavy quadruped instead of developer art | manual play test, Isometric Expanse |
+| GGC-T16 | 2026-10-18 | chore | closed | Add deploy.bat and project-owned /deploy, /run commands wrapping tools/deploy.ps1 so they run without a workflow ticket or pace-gate hold | — |

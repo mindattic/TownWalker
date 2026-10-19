@@ -25,7 +25,11 @@ powershell -File tools/build.ps1                       # Windows dev build -> Bu
 python tools/labcheck.py [demo ...]                    # plays each demo's loop, screenshots -> artifacts/labcheck
 dotnet test Tests/Core.Tests                           # the engine-free core (world, town, routing, hex)
 python tools/make_lab_icons.py                         # pixel icons (game-icons.net, CC BY 3.0)
+deploy.bat  /  powershell -File tools/deploy.ps1        # release build -> publish to C:\Apps\GridGameCaravan, refresh Desktop shortcut
 ```
+`/deploy` and `/run` are project-owned commands (`.claude/commands/`) that run `tools/deploy.ps1`
+and launch `C:\Apps\GridGameCaravan\GridGameCaravan.exe` directly — mechanical utilities, not
+project work, so they run instantly with no ticket or pace-gate hold.
 
 ## Map
 - `Assets/Lab/Core` — engine-free model (world, town, routing, hex) backing every demo

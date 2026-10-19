@@ -2,18 +2,21 @@
 <#
 .SYNOPSIS
     Shuts down any running GridGameCaravan, clears the release build output, rebuilds the Windows
-    Release player from scratch, and publishes a standalone copy to C:\Apps\GridGameCaravan\ — same
-    process UnityEve/Automata/KdpPublish/IdiotProof use to always have a fresh, independent deployed
-    copy instead of a possibly-stale one.
+    release player (Lab.EditorTools.LabBuild.BuildWindowsRelease), and publishes a standalone copy
+    to C:\Apps\GridGameCaravan\ — same process UnityEve/UnitySolarSystem/Automata/KdpPublish/
+    IdiotProof use to always have a fresh, independent deployed copy instead of a possibly-stale
+    dev build.
 
 .DESCRIPTION
     1. Stops any running GridGameCaravan.exe process (dev copy or deployed copy).
     2. Removes Build\WindowsRelease — the build OUTPUT only, never Library\ (Unity's asset
-       import / script-compile cache, which survives exactly as it does for a normal
-       Editor rebuild) — so the player build below is never a stale incremental copy.
-    3. Runs tools\unity.ps1 -Method Lab.EditorTools.LabBuild.BuildWindowsRelease in Unity
-       batch mode (requires the Editor closed) -> Build\WindowsRelease\GridGameCaravan.exe.
+       import / script-compile cache, which survives exactly as it does for a normal Editor
+       rebuild) — so the player build below is never a stale incremental copy.
+    3. Runs Unity in batch mode via tools\unity.ps1 (-executeMethod
+       Lab.EditorTools.LabBuild.BuildWindowsRelease, requires the Editor closed)
+       -> Build\WindowsRelease\GridGameCaravan.exe.
     4. Copies Build\WindowsRelease\* -> C:\Apps\GridGameCaravan\.
+    5. Writes/refreshes a Desktop shortcut pointing at the deployed exe.
 
 .PARAMETER Launch
     After publishing, immediately run the deployed GridGameCaravan.exe.
@@ -55,10 +58,10 @@ if (Test-Path $buildDir) {
 
 # ── Build ────────────────────────────────────────────────────────────────────
 Write-Host ''
-Write-Host '  Building Windows Release player (Unity batch mode)...' -ForegroundColor Cyan
-& (Join-Path $PSScriptRoot 'unity.ps1') -Method Lab.EditorTools.LabBuild.BuildWindowsRelease -Log deploy-build
+Write-Host '  Building Windows release player (Unity batch mode)...' -ForegroundColor Cyan
+& "$PSScriptRoot/unity.ps1" -Method Lab.EditorTools.LabBuild.BuildWindowsRelease -Log 'deploy-build'
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Build failed (exit $LASTEXITCODE)." -ForegroundColor Red
+    Write-Host "Build failed (exit $LASTEXITCODE). See Logs\deploy-build.log." -ForegroundColor Red
     exit $LASTEXITCODE
 }
 
@@ -83,6 +86,18 @@ if (-not (Test-Path $exe)) {
     exit 1
 }
 
+# ── Desktop shortcut ─────────────────────────────────────────────────────────
+# Points at the published copy, so double-clicking it (or /run) always plays the last deploy.
+# GetFolderPath, not $HOME\Desktop: OneDrive may have moved the Desktop folder.
+$shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'GridGame Caravan.lnk'
+$link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+$link.TargetPath       = $exe
+$link.WorkingDirectory = $out
+$link.IconLocation     = "$exe,0"
+$link.Description      = 'GridGame Caravan (deployed copy in C:\Apps)'
+$link.Save()
+Write-Host "    Shortcut -> $shortcut" -ForegroundColor Gray
+
 # ── Summary ────────────────────────────────────────────────────────────────
 Write-Host ''
 Write-Host '  Published successfully.' -ForegroundColor Green
@@ -93,3 +108,8 @@ if ($Launch) {
     Write-Host '  Launching...' -ForegroundColor Cyan
     Start-Process $exe
 }
+
+# An explicit success code: Unity runs via Start-Process inside unity.ps1, which already exits
+# with Unity's own code, but set it explicitly here too so a caller checking $LASTEXITCODE after
+# everything below (shortcut creation, etc.) doesn't read a stale/empty value as a failure.
+exit 0
