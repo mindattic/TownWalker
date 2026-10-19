@@ -28,6 +28,7 @@ namespace Lab.App
             () => new RouteMapDemo(),
             () => new HorizonDemo(),
             () => new IsoDemo(),
+            () => new SpiderDemo(),
             () => new LowPoly3DDemo(),
             () => new HexDemo(),
         };

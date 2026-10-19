@@ -31,7 +31,7 @@ def play(demo):
     f1 = h.call("walker")
     time.sleep(0.3)
     f2 = h.call("walker")
-    check(f"{demo}: walker is drawn", "feet" in f1 and len(f1["feet"]) == 4, json.dumps(f1)[:200])
+    check(f"{demo}: walker is drawn", "feet" in f1 and len(f1["feet"]) == f1.get("legs", 4), json.dumps(f1)[:200])
     fuel0 = st["town"]["fuel"]
     s = h.call("scan"); time.sleep(1.0)
     st = h.call("state")
@@ -67,14 +67,47 @@ def play(demo):
         check(f"{demo}: the town walks and its legs move", (not moving and st2["town"] != far["town"]) or f3.get("feet") != f4.get("feet"), f"{st2['phase']} {f3} {f4}")
         h.shot(f"{demo}-08-walking")
         h.call("wait", ms=200)
+    if demo == "spider":
+        spider_legs()
     print(f"  {demo}: {st['avgTimeToBattle']:.1f}s and {st['avgTapsToBattle']:.1f} taps to battle, fps {st['fps']}")
     logs = h.call("logs")
     check(f"{demo}: no errors", not any("Exception" in l or l.startswith("Error") for l in logs), "\n".join(l for l in logs if "Exception" in l or l.startswith("Error"))[:600])
     h.call("menu"); time.sleep(0.5)
 
 
+def spider_legs():
+    """Each leg count walks across the terrain on its own gait without tipping over."""
+    targets = {3: (930, 820), 4: (260, 900), 5: (880, 1700), 6: (300, 1650)}
+    for n in (3, 4, 5, 6):
+        r = h.call("legs", n=n)
+        check(f"spider: switches to {n} legs", r.get("legs") == n, str(r))
+        x, y = targets[n]
+        start = h.call("state")["town"]
+        h.call("tap", x=x, y=y)
+        worst = 0.0
+        lag = 0.0
+        prev = None
+        moved = False
+        for i in range(12):
+            time.sleep(0.25)
+            w = h.call("walker")
+            worst = max(worst, w.get("tilt", 0.0))
+            lag = max(lag, w.get("lag", 0.0))
+            moved = moved or (prev is not None and w["feet"] != prev)
+            prev = w["feet"]
+            if i == 5:
+                h.shot(f"spider-legs{n}-walking")
+        check(f"spider {n} legs: {n} feet drawn and stepping", len(prev or []) == n and moved, json.dumps(prev))
+        check(f"spider {n} legs: hull stays upright (max tilt {worst:.2f} rad)", worst < 0.5)
+        # the core waits while the hull lags (lurches included), so a stalled gait shows up as no progress
+        end = h.call("state")["town"]
+        went = ((end["x"] - start["x"]) ** 2 + (end["y"] - start["y"]) ** 2) ** 0.5
+        check(f"spider {n} legs: the gait carries the town forward ({went:.1f} units in 3 s, max lag {lag:.1f})", went > 3.0)
+        h.call("wait", ms=200)
+
+
 def main():
-    demos = sys.argv[1:] or ["routemap", "horizon", "iso", "lowpoly3d", "hex"]
+    demos = sys.argv[1:] or ["routemap", "horizon", "iso", "spider", "lowpoly3d", "hex"]
     h.launch("labcheck", fresh=True)
     time.sleep(3.0)
     h.shot("00-menu")

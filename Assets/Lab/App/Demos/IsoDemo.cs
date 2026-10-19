@@ -10,22 +10,22 @@ namespace Lab.App
     /// follows the town; tap anywhere to walk there (the walker turns to its heading in the iso projection), tap a site
     /// to choose it. Tests: real exploration and spectacle using art we can generate ourselves.
     /// </summary>
-    public sealed class IsoDemo : Demo
+    public class IsoDemo : Demo
     {
         public override string Id => "iso";
         public override string Title => "Isometric Expanse";
         public override string Pitch => "2.5D: tap anywhere to walk the town across hilly iso terrain; radar rings reveal sites. Exploration and spectacle with art we can make.";
 
-        private const float Cell = 4f, TileW = 132f, TileH = 66f, StepPx = 18f, ScreenCX = 585f, ScreenCY = 1180f;
+        protected const float Cell = 4f, TileW = 132f, TileH = 66f, StepPx = 18f, ScreenCX = 585f, ScreenCY = 1180f;
         private V2 cam;
         private Terrain terrain;
         private WalkerRig2D walker;
         private readonly Dictionary<int, VisualElement> icons = new Dictionary<int, VisualElement>();
         private readonly List<(V2 c, float r)> clear = new List<(V2, float)>();
-        private float pulse = -1f;
+        private float pulse = -1f, heading;
         private V2 lastPos;
 
-        private int Level(float x, float y) => Mathf.Clamp((int)(L.World.HeightAt(x, y) * 4f), 0, 3);
+        protected int Level(float x, float y) => Mathf.Clamp((int)(L.World.HeightAt(x, y) * 4f), 0, 3);
 
         /// <summary>World (x, y) at terrain level → design point.</summary>
         public Vector2 ToScreen(V2 p, float level)
@@ -64,6 +64,13 @@ namespace Lab.App
                 view.Add(ic);
                 icons[s.Id] = ic;
             }
+            BuildTown(view);
+            lastPos = L.Town.Pos;
+        }
+
+        /// <summary>Adds the town's rig to the view, above the terrain and site icons.</summary>
+        protected virtual void BuildTown(VisualElement view)
+        {
             walker = new WalkerRig2D(WalkerRig2D.View.Iso) { name = "walker", PixelsPerUnit = 13f, Ground = 0.82f };
             // Rotate the foot's rig-local offset by the walker's current heading (the same rotation it already
             // applies to its own geometry) to get a world-space offset from the town, then read this demo's own
@@ -77,7 +84,15 @@ namespace Lab.App
             walker.style.position = Position.Absolute;
             walker.style.width = 520; walker.style.height = 520;
             view.Add(walker);
-            lastPos = L.Town.Pos;
+        }
+
+        /// <summary>Per-frame rig update; <paramref name="heading"/> is the latest direction of travel (radians, world).</summary>
+        protected virtual void TickTown(float dt, float heading)
+        {
+            walker.Heading = heading;
+            walker.Walking = L.Phase == LoopPhase.Walking;
+            var tp = TownOnScreen;
+            walker.style.left = tp.x - 260; walker.style.top = tp.y - 426;
         }
 
         protected override void OnTap(Vector2 design)
@@ -102,13 +117,11 @@ namespace Lab.App
             {
                 clear.Add((L.Town.Pos, 18f));
                 var d = L.Town.Pos - lastPos;
-                walker.Heading = Mathf.Atan2(d.Y, d.X);
+                heading = Mathf.Atan2(d.Y, d.X);
                 lastPos = L.Town.Pos;
             }
             cam = V2.Lerp(cam, L.Town.Pos, 1f - Mathf.Exp(-dt * 3f));
-            walker.Walking = L.Phase == LoopPhase.Walking;
-            var tp = TownOnScreen;
-            walker.style.left = tp.x - 260; walker.style.top = tp.y - 426;
+            TickTown(dt, heading);
             foreach (var s in L.World.Sites)
             {
                 var ic = icons[s.Id];

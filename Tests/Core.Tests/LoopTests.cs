@@ -30,6 +30,22 @@ namespace Lab.Tests
         }
 
         [Test]
+        public void A_holding_town_stays_put_and_burns_nothing_until_released()
+        {
+            var l = new LabSession(3);
+            var start = l.Town.Pos; float fuel = l.Town.Fuel;
+            l.WalkTo(start + new V2(20, 0));
+            l.Holding = true;
+            for (int i = 0; i < 20; i++) l.Tick(0.05f);
+            Assert.That(l.Phase, Is.EqualTo(LoopPhase.Walking));
+            Assert.That(V2.Distance(l.Town.Pos, start), Is.EqualTo(0f));
+            Assert.That(l.Town.Fuel, Is.EqualTo(fuel));
+            l.Holding = false;
+            l.Tick(0.05f);
+            Assert.That(V2.Distance(l.Town.Pos, start), Is.GreaterThan(0f));
+        }
+
+        [Test]
         public void Walking_burns_fuel_and_a_dry_town_is_stranded()
         {
             var l = new LabSession(3);

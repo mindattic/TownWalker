@@ -130,6 +130,10 @@ namespace Lab.App
                     return app.Document.rootVisualElement.Query<VisualElement>().ToList().Where(e => e.name != null && e.name.StartsWith(prefix) && e.worldBound.width > 0).Select(e => e.name).ToList();
                 }
                 case "walker": return Walker(q["name"] ?? "walker");
+                case "legs":
+                    if (!(d is SpiderDemo sd)) return new { error = "not the spider demo" };
+                    sd.SetLegs((int)F(q["n"], 4));
+                    return new { ok = true, legs = sd.LegCount };
                 case "quit": Application.Quit(); return new { ok = true };
             }
             return new { error = "unknown endpoint " + path };
@@ -162,6 +166,11 @@ namespace Lab.App
             var w = LabApp.I.Document.rootVisualElement.Q<WalkerRig2D>(name);
             if (w == null)
             {
+                var sp = LabApp.I.Document.rootVisualElement.Q<SpiderRig>();
+                if (sp?.Body != null)
+                {
+                    return new { feet = sp.FootSnapshot(), legs = sp.Body.N, tilt = sp.Body.Tilt.magnitude, lag = sp.Body.Lag, sway = sp.Body.Sway.magnitude };
+                }
                 var r3 = FindAnyObjectByType<WalkerRig3D>();
                 if (r3 != null) return new { feet = r3.FootSnapshot() };
                 return new { error = "no walker named " + name };

@@ -77,6 +77,9 @@ namespace Lab.Core
 
         public bool InBikeRange(Site s) => V2.Distance(Town.Pos, s.Pos) <= Town.BikeRange;
 
+        /// <summary>Set by a view while its town turns in place before setting off: still Walking, but not moving.</summary>
+        public bool Holding;
+
         public void WalkTo(V2 target)
         {
             if (Town.Stranded) return;
@@ -88,7 +91,7 @@ namespace Lab.Core
         public bool Tick(float dt)
         {
             Clock += dt;
-            if (Phase != LoopPhase.Walking || Destination == null) return false;
+            if (Phase != LoopPhase.Walking || Destination == null || Holding) return false;
             var to = Destination.Value;
             var d = to - Town.Pos;
             float step = Town.Speed * dt;
