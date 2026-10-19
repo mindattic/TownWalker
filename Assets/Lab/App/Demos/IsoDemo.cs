@@ -77,7 +77,7 @@ namespace Lab.App
             // stepped terrain there — so each leg plants on the ground actually under it, cliffs included.
             walker.GroundAt = (fx, fz) =>
             {
-                float c = Mathf.Cos(walker.Heading), s = Mathf.Sin(walker.Heading);
+                float c = Mathf.Cos(walker.RenderHeading), s = Mathf.Sin(walker.RenderHeading);
                 float wx = L.Town.Pos.X + (fx * c - fz * s), wy = L.Town.Pos.Y + (fx * s + fz * c);
                 return Level(wx, wy) * (StepPx / walker.PixelsPerUnit);
             };
@@ -86,11 +86,13 @@ namespace Lab.App
             view.Add(walker);
         }
 
-        /// <summary>Per-frame rig update; <paramref name="heading"/> is the latest direction of travel (radians, world).</summary>
+        /// <summary>Per-frame rig update; <paramref name="heading"/> points at the destination (radians, world).</summary>
         protected virtual void TickTown(float dt, float heading)
         {
             walker.Heading = heading;
             walker.Walking = L.Phase == LoopPhase.Walking;
+            // The quadruped has a front: it pivots in place, stepping, until it faces where it's going, then sets off.
+            L.Holding = L.Phase == LoopPhase.Walking && Mathf.Abs(Mathf.DeltaAngle(walker.RenderHeading * Mathf.Rad2Deg, heading * Mathf.Rad2Deg)) > 4f;
             var tp = TownOnScreen;
             walker.style.left = tp.x - 260; walker.style.top = tp.y - 426;
         }
@@ -116,9 +118,12 @@ namespace Lab.App
             if (L.Phase == LoopPhase.Walking && V2.Distance(L.Town.Pos, lastPos) > 0.4f)
             {
                 clear.Add((L.Town.Pos, 18f));
-                var d = L.Town.Pos - lastPos;
-                heading = Mathf.Atan2(d.Y, d.X);
                 lastPos = L.Town.Pos;
+            }
+            if (L.Destination != null)
+            {
+                var d = L.Destination.Value - L.Town.Pos;
+                if (d.Length > 0.5f) heading = Mathf.Atan2(d.Y, d.X);
             }
             cam = V2.Lerp(cam, L.Town.Pos, 1f - Mathf.Exp(-dt * 3f));
             TickTown(dt, heading);

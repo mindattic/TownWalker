@@ -35,7 +35,11 @@ namespace Lab.App
         /// units. Null (the default) means flat ground at y=0, for demos with no real terrain to sample.</summary>
         public Func<float, float, float> GroundAt;
 
-        private float t, walkBlend, smokeTimer, impactTimer = 999f, bodyBob, terrainLift, terrainRoll, terrainPitch;
+        private float t, walkBlend, smokeTimer;
+        // The hull is a rigid body riding on four spring-damper legs: lift (rig units up), roll (about x; +
+        // lowers the +z side) and pitch (about z; + raises the bow), with their rates.
+        private float lift, roll, pitch, liftV, rollV, pitchV;
+        private readonly bool[] planted = new bool[4];
         private float renderHeading;
         private bool headingInit;
         /// <summary>The hull's actual drawn orientation — lags <see cref="Heading"/>, turning toward it gradually.</summary>
@@ -64,9 +68,11 @@ namespace Lab.App
         /// <summary>How far the hoof's toe breaks over (lifts toward the cannon bone) at the peak of swing — 0 at rest,
         /// so the block sits flat on the ground through stance.</summary>
         private const float BreakoverDeg = 22f;
-        /// <summary>How hard the whole town sinks on its legs at the instant a foot plants, in rig units — this is what
-        /// sells the mass of a city landing on four legs rather than a light hop.</summary>
-        private const float ImpactDrop = 0.62f;
+        // Hull dynamics: unit mass; leg springs soft enough that the town visibly settles onto each footfall and
+        // rocks onto the diagonal pair it's standing on; wide pads resist tilt up to load × half-width.
+        private const float G = 9.8f, LegK = 8f, LegC = 1.0f, RollInertia = 20f, PitchInertia = 26f;
+        private const float PadHalfWidth = 0.9f, PadK = 30f, PadC = 8f, SubStep = 1f / 240f;
+        private const float LegRest = 7.4f + G / (4f * LegK); // preload: rides at hip height 7.4 on four feet
         private static readonly Vector3[] Chimneys = { new Vector3(-3.6f, 15.6f, 1.6f), new Vector3(-2.4f, 14.6f, -2.2f) };
 
         private static List<Box> BuildBody()
@@ -159,28 +165,15 @@ namespace Lab.App
                 // cannon bone) while clearing the ground mid-swing — never below flat, so the sole is always the
                 // lowest point of the leg.
                 footAngle[i] = (p < Stance ? 0f : Mathf.Sin(Mathf.Pow((p - Stance) / (1f - Stance), 0.72f) * Mathf.PI) * BreakoverDeg) * walkBlend;
-                // a foot just planted: dust, and the whole town's weight comes down on it
+                // a foot just planted: dust (the hull's settling onto it comes out of the physics below)
                 if (walkBlend > 0.3f && lastPhase[i] >= Stance - 0.02f && p < Stance && p < 0.1f)
-                {
                     for (int d = 0; d < 3; d++) dust.Add(new Puff { P = feet[i] + new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), 0.1f, UnityEngine.Random.Range(-0.6f, 0.6f)), Life = 0.9f, Size = 0.7f });
-                    impactTimer = 0f;
-                }
                 lastPhase[i] = p;
+                // a foot bears load through stance; once the gait has blended out every foot is down
+                planted[i] = p < Stance || walkBlend < 0.05f;
             }
-            // The hull reads the ground the same way its individual feet do: lifted by their average height,
-            // tipped by the slope between front/back and left/right pairs — so four legs each landing on
-            // different terrain actually shows up as the whole town tilting, not just as feet floating apart.
-            terrainLift = (feet[0].y + feet[1].y + feet[2].y + feet[3].y) / 4f;
-            float frontY = (feet[0].y + feet[1].y) / 2f, backY = (feet[2].y + feet[3].y) / 2f;
-            float leftY = (feet[0].y + feet[2].y) / 2f, rightY = (feet[1].y + feet[3].y) / 2f;
-            terrainPitch = Mathf.Atan2(frontY - backY, 7.2f);
-            terrainRoll = Mathf.Atan2(leftY - rightY, 6.4f);
-            // Body motion isn't a smooth float: it's a sharp compression at the instant a foot lands (the whole town's
-            // mass arriving on that leg) followed by a slower spring-back, the same snap-then-ease shape real footfalls
-            // have — rather than a continuous sine bob that never actually reads as an impact.
-            impactTimer += dt;
-            float impact = Mathf.Exp(-impactTimer * 9f) * ImpactDrop * walkBlend;
-            bodyBob = -impact + Mathf.Sin(t * 1.3f) * 0.05f * walkBlend;
+            int n = Mathf.Max(1, Mathf.CeilToInt(dt / SubStep));
+            for (int s = 0; s < n; s++) Integrate(dt / n);
             smokeTimer -= dt;
             if (smokeTimer <= 0f)
             {
@@ -190,6 +183,33 @@ namespace Lab.App
             Age(smoke, dt, new Vector3(-0.9f, 1.6f, 0.3f));
             Age(dust, dt, new Vector3(0f, 0.6f, 0f));
             MarkDirtyRepaint();
+        }
+
+        /// <summary>One physics substep: each planted leg pushes (never pulls) its hip up with a damped spring
+        /// on the gap between hip and foot, so the hull's height, roll and pitch come from which feet are down
+        /// and what ground they're standing on, not from a scripted bob.</summary>
+        private void Integrate(float h)
+        {
+            float force = -G, rollT = 0f, pitchT = 0f;
+            for (int i = 0; i < 4; i++)
+            {
+                if (!planted[i]) continue;
+                var hp = Hips[i];
+                float ext = hp.y + lift - roll * hp.z + pitch * hp.x - feet[i].y;
+                float v = liftV - rollV * hp.z + pitchV * hp.x;
+                float f = Mathf.Max(0f, LegK * (LegRest - ext) - LegC * v);
+                force += f;
+                rollT -= f * hp.z;
+                pitchT += f * hp.x;
+                float cap = f * PadHalfWidth;
+                rollT += Mathf.Clamp(-PadK * roll - PadC * rollV, -cap, cap);
+                pitchT += Mathf.Clamp(-PadK * pitch - PadC * pitchV, -cap, cap);
+            }
+            liftV += force * h; lift += liftV * h;
+            rollV += rollT / RollInertia * h; roll += rollV * h;
+            pitchV += pitchT / PitchInertia * h; pitch += pitchV * h;
+            roll = Mathf.Clamp(roll, -0.5f, 0.5f);
+            pitch = Mathf.Clamp(pitch, -0.5f, 0.5f);
         }
 
         private static void Age(List<Puff> list, float dt, Vector3 drift)
@@ -202,18 +222,14 @@ namespace Lab.App
             }
         }
 
-        /// <summary>Body motion: the hips drop with each footfall's impact (see `bodyBob` in Step), plus a slow sway and
-        /// a slight pitch into the stride.</summary>
+        /// <summary>Body motion: the simulated hull pose (see <see cref="Integrate"/>).</summary>
         private Vector3 BodyToScreenSpace(Vector3 p, bool onBody)
         {
             if (onBody)
             {
-                float w = walkBlend;
-                float roll = Mathf.Sin(t / GaitPeriod * Mathf.PI * 2f) * 0.035f * w + terrainRoll;
-                float pitch = Mathf.Sin(t / GaitPeriod * Mathf.PI * 4f) * 0.012f * w + terrainPitch;
                 p = new Vector3(p.x, p.y * Mathf.Cos(roll) - p.z * Mathf.Sin(roll), p.y * Mathf.Sin(roll) + p.z * Mathf.Cos(roll));
                 p = new Vector3(p.x * Mathf.Cos(pitch) - p.y * Mathf.Sin(pitch), p.x * Mathf.Sin(pitch) + p.y * Mathf.Cos(pitch), p.z);
-                p.y += bodyBob + terrainLift;
+                p.y += lift;
             }
             if (Mode == View.Iso)
             {
