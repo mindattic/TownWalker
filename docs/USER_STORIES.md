@@ -1,14 +1,14 @@
 ---
 codex: 1
-project: GridGameCaravan
+project: TownWalker
 code: GGC
 layer: stories
 status: living
 updated: 2026-10-12
 ---
-<!-- GENERATED from MindAttic.Workflow/data/workflow.db by `workflow db render`. Do not edit: this file is rewritten from the database; change stories and tickets with the workflow CLI. -->
+<!-- GENERATED from MindAttic.Tickets/data/Tickets.db by `tickets db render`. Do not edit: this file is rewritten from the database; change stories and tickets with the tickets CLI. -->
 
-# GridGameCaravan — User Stories
+# TownWalker — User Stories
 > ✅ done (shipped & tested) · 🟡 partial · ⬜ planned. Every ✅ cites the test.
 
 ## Priority backlog
@@ -41,3 +41,5 @@ _Nothing recorded yet._
 | GGC-T18 | 2026-10-19 | feature | closed | Spider Town demo: the iso expanse walked by a radially symmetric spider town on 3-6 insect (/\) legs, rigid-body + spring-leg physics, a free gait with a static-stability check (tripod lurch, crawl, wave, alternating tripod), feet planting on every terrain step | — |
 | GGC-T19 | 2026-10-19 | feature | closed | The cow walker's hull rides on simulated spring legs (rigid-body lift/roll/pitch) instead of a scripted bob/tilt, and in the iso expanse it turns in place to face its destination before it sets off | — |
 | GGC-T20 | 2026-10-19 | chore | closed | Rename GridGameCaravan to TownWalker (owner 2026-10-19): it is now a standalone project, not GridGameGaiden's traversal lab. Product name, exe, deploy folder and shortcut, tools, docs and comments renamed; GitHub repo renamed; workflow repo key renamed; the owner renames the Windows folder. | — |
+| GGC-T21 | 2026-10-19 | chore | open | Convert tracked source files to LF line endings via .gitattributes, per HOUSE-LAW-13 (low priority) | — |
+| GGC-T22 | 2026-10-20 | docs | open | Publish TownWalker docs to GitHub Pages via the shared Toolkit DocFX pipeline: run adopt-docs-site.ps1 (README.md as home page, docs/*.md as articles, API reference only where the code builds in CI), enable Pages with build_type=workflow, set the repo homepage URL, retire tools/build-readme.ps1 and README.htm, confirm the docs Actions run is green and https://mindattic.github.io/TownWalker/ returns 200. Depends on MAT-T8. | — |
