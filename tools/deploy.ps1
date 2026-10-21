@@ -3,7 +3,7 @@
 .SYNOPSIS
     Shuts down any running TownWalker, clears the release build output, rebuilds the Windows
     release player (Lab.EditorTools.LabBuild.BuildWindowsRelease), and publishes a standalone copy
-    to C:\Apps\TownWalker\ — same process UnityEve/UnitySolarSystem/Automata/KdpPublish/
+    to C:\Apps\TownWalker\ — same process Unity.Eve/UnitySolarSystem/Automata/KdpPublish/
     IdiotProof use to always have a fresh, independent deployed copy instead of a possibly-stale
     dev build.
 
