@@ -7,11 +7,11 @@ allowed-tools: Read, Bash, PowerShell
 # /deploy — TownWalker
 
 Project-owned override of the global MindAttic `/deploy` router: this repo's deploy mechanism is
-`tools\deploy.ps1` (`deploy.bat` wraps it at the repo root), authoritative per the router's own
+`tools\run.ps1` (`run.bat` wraps it at the repo root), authoritative per the router's own
 rule 1. Run it directly, right away:
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\deploy.ps1 $ARGUMENTS
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run.ps1 $ARGUMENTS
 ```
 
 This is a mechanical build/publish utility, not project work — it needs no workflow ticket, no

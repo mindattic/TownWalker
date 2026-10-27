@@ -3,12 +3,12 @@
   Deploys the current Release build to C:\Apps\TownWalker, then offers Normal Play, Demo +
   Capture, or Quit.
 .NOTES
-  Always redeploys from source first (tools\deploy.ps1), so this never runs a stale build.
+  Always redeploys from source first (tools\run.ps1), so this never runs a stale build.
   Requires the Unity Editor closed for this project.
 #>
 $ErrorActionPreference = "Stop"
 
-& (Join-Path $PSScriptRoot "deploy.ps1")
+& (Join-Path $PSScriptRoot "run.ps1")
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Deploy failed (exit $LASTEXITCODE); not launching." -ForegroundColor Red
     exit $LASTEXITCODE
