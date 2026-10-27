@@ -21,6 +21,12 @@
 .PARAMETER Launch
     After publishing, immediately run the deployed TownWalker.exe.
 
+.NOTES
+    This script never prompts, so agents and /deploy can run it unattended. The repo-root
+    deploy.bat is the interactive entry point: it asks 1) Deploy & Run (this script with -Launch;
+    every run rebuilds, there is no up-to-date skip) or 2) Run (starts the copy already in
+    C:\Apps\TownWalker without calling this script, deploying first if none is there).
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File tools\deploy.ps1
     powershell -ExecutionPolicy Bypass -File tools\deploy.ps1 -Launch
