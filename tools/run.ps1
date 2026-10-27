@@ -16,7 +16,7 @@
        Lab.EditorTools.LabBuild.BuildWindowsRelease, requires the Editor closed)
        -> Build\WindowsRelease\TownWalker.exe.
     4. Copies Build\WindowsRelease\* -> C:\Apps\TownWalker\.
-    5. Writes/refreshes a Desktop shortcut pointing at the deployed exe.
+    0. First, writes/refreshes a Desktop shortcut pointing at the repo-root run.bat (the menu).
 
 .PARAMETER Launch
     After publishing, immediately run the deployed TownWalker.exe.
@@ -40,6 +40,20 @@ $repoDir  = Split-Path $PSScriptRoot   # tools\ -> TownWalker\
 $out      = 'C:\Apps\TownWalker'
 $exeName  = 'TownWalker.exe'
 $buildDir = Join-Path $repoDir 'Build\WindowsRelease'
+
+# ── Desktop shortcut ─────────────────────────────────────────────────────────
+# Points at the repo-root run.bat, so a double-click asks Deploy & Run or Run first. Refreshed
+# before the build so it's right even if the build fails. GetFolderPath, not $HOME\Desktop:
+# OneDrive may have moved the Desktop folder.
+$shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'TownWalker.lnk'
+$link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+$link.TargetPath       = Join-Path $repoDir 'run.bat'
+$link.WorkingDirectory = $repoDir
+$link.IconLocation     = "$out\$exeName,0"
+$link.Description      = 'TownWalker: Deploy & Run, or Run the copy in C:\Apps'
+$link.WindowStyle      = 1
+$link.Save()
+Write-Host "    Shortcut -> $shortcut" -ForegroundColor Gray
 
 # ── Stop running instance ──────────────────────────────────────────────────
 Write-Host ''
@@ -91,18 +105,6 @@ if (-not (Test-Path $exe)) {
     Write-Host "Publish completed but $exeName not found at $exe." -ForegroundColor Red
     exit 1
 }
-
-# ── Desktop shortcut ─────────────────────────────────────────────────────────
-# Points at the published copy, so double-clicking it (or /run) always plays the last deploy.
-# GetFolderPath, not $HOME\Desktop: OneDrive may have moved the Desktop folder.
-$shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'TownWalker.lnk'
-$link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
-$link.TargetPath       = $exe
-$link.WorkingDirectory = $out
-$link.IconLocation     = "$exe,0"
-$link.Description      = 'TownWalker (deployed copy in C:\Apps)'
-$link.Save()
-Write-Host "    Shortcut -> $shortcut" -ForegroundColor Gray
 
 # ── Summary ────────────────────────────────────────────────────────────────
 Write-Host ''
