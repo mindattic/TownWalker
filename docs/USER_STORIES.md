@@ -46,3 +46,5 @@ _Nothing recorded yet._
 | GGC-T23 | 2026-10-20 | chore | closed | Update deploy.ps1 comment's sibling-repo reference from UnityEve to its new name Unity.Eve (Unity Fleet Rename) | deploy.ps1 comment text update |
 | GGC-T24 | 2026-10-22 | docs | closed | Update USER_STORIES.md | — |
 | GGC-T25 | 2026-10-24 | docs | closed | Update USER_STORIES.md | — |
+| GGC-T26 | 2026-10-27 | fix | closed | Fix Desktop shortcut icon path: points at nonexistent C:\Apps\TownWalker\TownWalker.exe | tools/run.ps1@2e03be4 |
+| GGC-T27 | 2026-10-27 | docs | closed | Update USER_STORIES.md | — |
