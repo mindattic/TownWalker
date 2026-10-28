@@ -45,11 +45,21 @@ $buildDir = Join-Path $repoDir 'Build\WindowsRelease'
 # Points at the repo-root run.bat, so a double-click asks Deploy & Run or Run first. Refreshed
 # before the build so it's right even if the build fails. GetFolderPath, not $HOME\Desktop:
 # OneDrive may have moved the Desktop folder.
+#
+# IconLocation is special-cased: $out\$exeName is this run's TARGET (it may not exist yet, e.g.
+# right after a repo/product rename, before the first successful deploy under the new name —
+# see GGC-T26, where TownWalker was renamed from GridGameCaravan but the shortcut's icon kept
+# pointing at the not-yet-deployed C:\Apps\TownWalker\TownWalker.exe for days because nothing
+# re-pointed it at the still-working pre-rename copy). Only point the icon at it if it already
+# exists; otherwise leave whatever icon the shortcut already had (a working icon beats a broken
+# one) and let the post-publish block below re-aim it once the new exe is actually on disk.
 $shortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'TownWalker.lnk'
 $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
 $link.TargetPath       = Join-Path $repoDir 'run.bat'
 $link.WorkingDirectory = $repoDir
-$link.IconLocation     = "$out\$exeName,0"
+if (Test-Path (Join-Path $out $exeName)) {
+    $link.IconLocation = "$out\$exeName,0"
+}
 $link.Description      = 'TownWalker: Deploy & Run, or Run the copy in C:\Apps'
 $link.WindowStyle      = 1
 $link.Save()
@@ -104,6 +114,17 @@ $exe = Join-Path $out $exeName
 if (-not (Test-Path $exe)) {
     Write-Host "Publish completed but $exeName not found at $exe." -ForegroundColor Red
     exit 1
+}
+
+# ── Re-aim shortcut icon ──────────────────────────────────────────────────────
+# $exe is guaranteed to exist at this point (checked above), so this is the one place the icon
+# can be safely pointed at the freshly published copy even right after a rename (GGC-T26).
+try {
+    $link = (New-Object -ComObject WScript.Shell).CreateShortcut($shortcut)
+    $link.IconLocation = "$out\$exeName,0"
+    $link.Save()
+} catch {
+    Write-Host "    Warning: could not refresh shortcut icon ($_)." -ForegroundColor DarkYellow
 }
 
 # ── Summary ────────────────────────────────────────────────────────────────
