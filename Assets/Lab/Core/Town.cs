@@ -116,6 +116,9 @@ namespace Lab.Core
             if (s == null || s.Cleared || !InBikeRange(s)) return null;
             float dist = V2.Distance(Town.Pos, s.Pos);
             Current = new Expedition { Site = s, RoadFights = Math.Min(2, (int)(dist / 11f)), RideSeconds = 0.6f + dist / 22f };
+            // Sending the team mid-walk stops the town where it stands: drop the walk target so views don't keep
+            // drawing a route/flag to a destination the town will never resume walking to.
+            Destination = null;
             Phase = LoopPhase.Riding;
             return Current;
         }

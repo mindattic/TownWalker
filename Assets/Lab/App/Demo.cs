@@ -26,6 +26,7 @@ namespace Lab.App
 
         private VisualElement fuelFill, sitePanel;
         private Label toast;
+        private IVisualElementScheduledItem toastFade;
         private Label fuelLabel, resLabel, statsLabel, phaseLabel;
 
         public void Mount(LabApp app, VisualElement parent, int seed)
@@ -63,7 +64,12 @@ namespace Lab.App
 
         public void Tick(float dt)
         {
-            if (L.Tick(dt)) OnArrived();
+            if (L.Tick(dt))
+            {
+                OnArrived();
+                // the town moved: the site panel's distance/range (and its Send button) were computed before the walk
+                if (Selected != null && !Busy) BuildSitePanel();
+            }
             TickView(dt);
             RefreshHud();
         }
@@ -83,9 +89,10 @@ namespace Lab.App
         {
             if (Busy) return;
             L.Tap();
+            bool canScan = L.Town.Fuel >= L.Town.ScanCost; // checked before the scan spends its fuel
             int n = L.Scan();
             OnScanned(n);
-            Toast(L.Town.Fuel < L.Town.ScanCost && n == 0 ? "Not enough fuel to run the radar" : $"Radar: {n} new site{(n == 1 ? "" : "s")}");
+            Toast(!canScan ? "Not enough fuel to run the radar" : $"Radar: {n} new site{(n == 1 ? "" : "s")}");
         }
 
         public void Select(Site s)
@@ -207,7 +214,9 @@ namespace Lab.App
         {
             toast.text = text;
             toast.style.opacity = 1;
-            toast.schedule.Execute(() => toast.style.opacity = 0).ExecuteLater(1600);
+            toastFade?.Pause(); // an earlier toast's fade must not cut this one short
+            toastFade = toast.schedule.Execute(() => toast.style.opacity = 0);
+            toastFade.ExecuteLater(1600);
         }
 
         // ── The ride, the battle, the haul (shared beats) ──────────────────────
@@ -247,6 +256,8 @@ namespace Lab.App
                 yield return Tween.Wait(0.45f);
             }
             ride.RemoveFromHierarchy();
+            // Left the demo mid-ride (back to the menu or another demo): don't paint this battle over whatever is open now.
+            if (App.Current != this) { Busy = false; yield break; }
 
             // Placeholder battle: waves, then the boss.
             L.BeginBattle();
@@ -264,6 +275,7 @@ namespace Lab.App
                 yield return Tween.Wait(0.4f);
             }
             card.RemoveFromHierarchy();
+            if (App.Current != this) { Busy = false; yield break; }
             var site = ex.Site;
             L.EndBattle(true);
             ExpeditionsRun++;

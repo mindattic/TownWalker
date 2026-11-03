@@ -27,6 +27,7 @@ namespace Lab.App
         private float smokeTimer;
         private static Material baseMat, smokeMat;
         private static readonly Dictionary<Color, Material> mats = new Dictionary<Color, Material>();
+        private readonly List<Mesh> roofMeshes = new List<Mesh>();
 
         /// <summary>Flat-lit materials per colour (Lab/FlatLit lives in Resources, so builds keep it).</summary>
         private static Material Mat(Color c)
@@ -86,6 +87,7 @@ namespace Lab.App
             for (int i = 0; i < 4; i++) { int s = v.Count; v.Add(b[i]); v.Add(apex); v.Add(b[(i + 1) % 4]); tri.Add(s); tri.Add(s + 1); tri.Add(s + 2); col.Add(Color.white); col.Add(Color.white); col.Add(Color.white); }
             var mesh = new Mesh(); mesh.SetVertices(v); mesh.SetTriangles(tri, 0); mesh.SetColors(col); mesh.RecalculateNormals();
             mf.sharedMesh = mesh;
+            roofMeshes.Add(mesh);
         }
 
         private void Build()
@@ -245,6 +247,10 @@ namespace Lab.App
             }
         }
 
-        private void OnDestroy() { foreach (var (t, _) in smoke) if (t != null) Destroy(t.gameObject); }
+        private void OnDestroy()
+        {
+            foreach (var (t, _) in smoke) if (t != null) Destroy(t.gameObject);
+            foreach (var m in roofMeshes) if (m != null) Destroy(m); // runtime meshes aren't freed with their GameObject
+        }
     }
 }

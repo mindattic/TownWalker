@@ -42,6 +42,8 @@ namespace Lab.App
         protected override void BuildView(VisualElement view)
         {
             L.Town.Pos = new V2(14f, 0f); // the town walks the road at the front of the strip
+            // the session revealed the world's centre before the town was moved here: undo that, reveal only around the town
+            foreach (var s in L.World.Sites) s.Revealed = false;
             L.Reveal(L.Town.Pos, 18f);
             camX = L.Town.Pos.X;
             layers = new Parallax(this) { name = "parallax" };

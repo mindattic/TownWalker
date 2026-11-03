@@ -27,7 +27,8 @@ namespace Lab.App
         private LineRenderer rangeRing, pulseRing;
         private readonly Dictionary<int, VisualElement> icons = new Dictionary<int, VisualElement>();
         private readonly List<(V2 c, float r)> clear = new List<(V2, float)>();
-        private Vector2? pressAt; private float pressYaw; private bool dragged;
+        private Vector2? pressAt, pendingTap; private float pressYaw; private bool dragged;
+        private readonly List<Material> materials = new List<Material>();
         private V2 lastPos;
 
         private float H(float x, float z) => L.World.HeightAt(x, z) * HeightScale;
@@ -82,7 +83,13 @@ namespace Lab.App
                 if (Mathf.Abs(dx) > 24f) dragged = true;
                 if (dragged) yaw = pressYaw + dx * 0.07f;
             });
-            view.RegisterCallback<PointerUpEvent>(_ => pressAt = null);
+            // Released anywhere over the demo (the view or the HUD above it): a press that never dragged was a tap.
+            Root.RegisterCallback<PointerUpEvent>(_ =>
+            {
+                var tap = pendingTap;
+                pendingTap = null; pressAt = null;
+                if (tap != null && !dragged && !Busy) TapAt(tap.Value);
+            });
             lastPos = L.Town.Pos;
             PlaceCamera(1f);
         }
@@ -90,6 +97,9 @@ namespace Lab.App
         public override void Unmount()
         {
             Object.Destroy(root);
+            // meshes and materials made with `new` aren't owned by the GameObjects: free them with the demo
+            Object.Destroy(terrain);
+            foreach (var m in materials) Object.Destroy(m);
             RenderSettings.fog = false;
             App.Camera.cullingMask = 0;
             App.Camera.backgroundColor = new Color(0.04f, 0.05f, 0.09f);
@@ -123,7 +133,9 @@ namespace Lab.App
             var go = new GameObject("Terrain");
             go.transform.SetParent(root.transform, false);
             go.AddComponent<MeshFilter>().sharedMesh = terrain;
-            go.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Lab/VertexColorLit"));
+            var mat = new Material(Shader.Find("Lab/VertexColorLit"));
+            materials.Add(mat);
+            go.AddComponent<MeshRenderer>().sharedMaterial = mat;
         }
 
         /// <summary>Unseen ground is darkened (fog of war) by re-tinting vertex colours.</summary>
@@ -145,7 +157,9 @@ namespace Lab.App
             var go = new GameObject(name);
             go.transform.SetParent(root.transform, false);
             var lr = go.AddComponent<LineRenderer>();
-            lr.sharedMaterial = new Material(Shader.Find("Lab/UnlitColor"));
+            var mat = new Material(Shader.Find("Lab/UnlitColor"));
+            materials.Add(mat);
+            lr.sharedMaterial = mat;
             lr.positionCount = 64; lr.loop = true; lr.widthMultiplier = width;
             lr.startColor = lr.endColor = c;
             return lr;
@@ -195,7 +209,14 @@ namespace Lab.App
 
         protected override void OnTap(Vector2 design)
         {
-            if (dragged) return;
+            // A real press fires this on pointer-down, before it's known whether the finger will drag to orbit:
+            // hold it until release. Taps with no press in flight (automation) act at once.
+            if (pressAt != null) { pendingTap = design; return; }
+            TapAt(design);
+        }
+
+        private void TapAt(Vector2 design)
+        {
             var s = PickSite(design, SiteOnScreen, 90f);
             if (s != null) { Select(s); return; }
             // ray-march to the terrain

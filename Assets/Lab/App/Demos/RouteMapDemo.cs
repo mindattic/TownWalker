@@ -92,6 +92,8 @@ namespace Lab.App
 
         protected override void TickView(float dt)
         {
+            // a route interrupted (team sent mid-walk) or cut short (stranded) is abandoned, not resumed later
+            if (L.Phase != LoopPhase.Walking) waypoints.Clear();
             if (L.Phase == LoopPhase.Walking && V2.Distance(L.Town.Pos, lastPos) > 0.5f)
             {
                 clear.Add((L.Town.Pos, 18f));
