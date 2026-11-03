@@ -88,7 +88,7 @@ namespace Lab.App
             {
                 var tap = pendingTap;
                 pendingTap = null; pressAt = null;
-                if (tap != null && !dragged && !Busy) TapAt(tap.Value);
+                if (tap != null && !dragged && !Busy) { CountTap(); TapAt(tap.Value); }
             });
             lastPos = L.Town.Pos;
             PlaceCamera(1f);
@@ -214,6 +214,9 @@ namespace Lab.App
             if (pressAt != null) { pendingTap = design; return; }
             TapAt(design);
         }
+
+        // A real press may still become an orbit drag, so its tap is counted on release, not on pointer-down.
+        protected override bool DefersTap() => pressAt != null;
 
         private void TapAt(Vector2 design)
         {

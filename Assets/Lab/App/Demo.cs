@@ -55,6 +55,14 @@ namespace Lab.App
         protected abstract void TickView(float dt);
         /// <summary>A tap on the view in design coordinates (1170×2532): select a site, or pick a walk target.</summary>
         protected abstract void OnTap(Vector2 design);
+
+        /// <summary>True when this press might still turn into a drag (e.g. an orbit), so the demo resolves it on
+        /// release and counts the tap itself only if it was one (<see cref="CountTap"/>): a drag is not a tap
+        /// in the taps-to-battle metric.</summary>
+        protected virtual bool DefersTap() => false;
+
+        /// <summary>Counts a deferred press as a tap once it is known not to have been a drag.</summary>
+        protected void CountTap() => L.Tap();
         /// <summary>Draw the radar pulse; <paramref name="found"/> sites were just revealed.</summary>
         protected abstract void OnScanned(int found);
         /// <summary>Where the ride beat starts (the town) in design coordinates — for the bike's departure.</summary>
@@ -81,7 +89,7 @@ namespace Lab.App
         public void Tap(Vector2 design)
         {
             if (Busy) return;
-            L.Tap();
+            if (!DefersTap()) L.Tap();
             OnTap(design);
         }
 

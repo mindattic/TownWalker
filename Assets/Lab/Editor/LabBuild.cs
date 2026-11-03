@@ -38,6 +38,18 @@ namespace Lab.EditorTools
 
         public static void BuildWindowsRelease() => Build(BuildTarget.StandaloneWindows64, "Build/WindowsRelease/TownWalker.exe", false);
 
+        // Development APK (with the automation endpoint), as Gaiden's GaidenBuild.BuildAndroid: IL2CPP, ARM64 + x86_64,
+        // API 26+, a plain .apk rather than an app bundle. tools/build.ps1 -Target Android.
+        public static void BuildAndroid()
+        {
+            PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android, "com.mindattic.townwalker");
+            PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.X86_64;
+            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            EditorUserBuildSettings.buildAppBundle = false;
+            Build(BuildTarget.Android, "Build/Android/TownWalker.apk", true);
+        }
+
         public static void BuildWebGL()
         {
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
