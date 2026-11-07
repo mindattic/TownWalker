@@ -8,6 +8,12 @@
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       }
     },
+    "com.mindattic.unity.shared": {
+      "version": "file:../../Unity.Shared/unity/com.mindattic.unity.shared",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.multiplayer.center": {
       "version": "1.0.1",
       "depth": 0,

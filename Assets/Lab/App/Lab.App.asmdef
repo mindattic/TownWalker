@@ -1,7 +1,7 @@
 {
   "name": "Lab.App",
   "rootNamespace": "Lab.App",
-  "references": ["Lab.Core"],
+  "references": ["Lab.Core", "Unity.Shared.Core"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

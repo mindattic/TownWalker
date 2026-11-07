@@ -18,6 +18,10 @@
     4. Copies Build\WindowsRelease\* -> C:\Apps\TownWalker\.
     0. First, writes/refreshes a Desktop shortcut pointing at the repo-root run.bat (the menu).
 
+.PARAMETER Headless
+    After publishing, run the deployed TownWalker.exe with no window through ..\Unity.Shared\tools\Start-Headless.ps1
+    (--headless -batchmode -nographics; waits for the MINDATTIC_HEADLESS_READY log line). Implies launching (GGC-T32).
+
 .PARAMETER Launch
     After publishing, immediately run the deployed TownWalker.exe.
 
@@ -31,7 +35,7 @@
     powershell -ExecutionPolicy Bypass -File tools\run.ps1
     powershell -ExecutionPolicy Bypass -File tools\run.ps1 -Launch
 #>
-param([switch]$Launch)
+param([switch]$Launch, [switch]$Headless)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -132,6 +136,12 @@ Write-Host ''
 Write-Host '  Published successfully.' -ForegroundColor Green
 Write-Host "    Exe : $exe ($([math]::Round(((Get-Item $exe).Length / 1MB), 1)) MB)" -ForegroundColor Gray
 Write-Host ''
+
+if ($Headless) {
+    Write-Host '  Launching headless...' -ForegroundColor Cyan
+    & (Join-Path $repoDir '..\Unity.Shared\tools\Start-Headless.ps1') -Exe $exe -Wait
+    exit $LASTEXITCODE
+}
 
 if ($Launch) {
     Write-Host '  Launching...' -ForegroundColor Cyan

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Shared.Core;
 using UnityEngine.UIElements;
 
 namespace Lab.App
@@ -57,6 +58,8 @@ namespace Lab.App
             Camera.cullingMask = 0;
             BuildPanel();
             ShowMenu();
+            // GGC-T32: --headless has nobody to click the menu, so open the first demo as an ordinary session.
+            Headless.WhenActive(() => Open(Catalog[0]()));
             LabDemoMode.TryStart(this);
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             LabAutomation.TryStart(this);

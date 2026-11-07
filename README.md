@@ -33,6 +33,8 @@ dotnet test Tests/Core.Tests                           # the engine-free core (w
 python tools/make_lab_icons.py                         # pixel icons (game-icons.net, CC BY 3.0)
 ```
 
+Headless (scripted testing, off by default): `powershell -File tools/run.ps1 -Headless` deploys as usual, then runs the player with no window through the shared launcher (`..\Unity.Shared\tools\Start-Headless.ps1`: `--headless -batchmode -nographics`), waits for the `MINDATTIC_HEADLESS_READY` log line, and opens the first demo instead of waiting at the menu. Without `--headless` nothing changes.
+
 Everything is code-built (`Assets/Lab/App/LabApp.cs` boots it). The walker is drawn from
 scratch (`Assets/Lab/App/Walker/WalkerRig2D.cs`): a small 3D model projected side-on or isometric with Painter2D.
 The owner's mood board is a style reference only.
