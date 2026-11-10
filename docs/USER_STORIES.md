@@ -54,4 +54,5 @@ _Nothing recorded yet._
 | GGC-T31 | 2026-11-02 | fix | closed | Fix the open items the 2026-11-02 bughunt left for decision (build.ps1 -Target Android, stale harness.py commands, track tools/point.png.meta, 3D drag not a tap) | — |
 | GGC-T32 | 2026-11-06 | feature | closed | Adopt the shared off-by-default --headless launch mode (Unity.Shared) | f41e997 |
 | GGC-T33 | 2026-11-10 | chore | closed | Crash recovery: commit the command-catalog sync (.agent/commands/*.md) and regenerated docs/USER_STORIES.md left uncommitted by the session crash | — |
-| GGC-T34 | 2026-11-10 | chore | open | Crash recovery: commit the command-catalog sync (.agent/commands/*.md) and regenerated docs/USER_STORIES.md left uncommitted by the session crash | — |
+| GGC-T34 | 2026-11-10 | chore | closed | Crash recovery: commit the command-catalog sync (.agent/commands/*.md) and regenerated docs/USER_STORIES.md left uncommitted by the session crash | — |
+| GGC-T35 | 2026-11-10 | chore | open | Crash recovery / fleet sync: commit the regenerated docs/USER_STORIES.md left uncommitted after other tickets closed elsewhere | — |
