@@ -42,17 +42,19 @@ _Nothing recorded yet._
 | GGC-T19 | 2026-10-19 | feature | closed | The cow walker's hull rides on simulated spring legs (rigid-body lift/roll/pitch) instead of a scripted bob/tilt, and in the iso expanse it turns in place to face its destination before it sets off | — |
 | GGC-T20 | 2026-10-19 | chore | closed | Rename GridGameCaravan to TownWalker (owner 2026-10-19): it is now a standalone project, not GridGameGaiden's traversal lab. Product name, exe, deploy folder and shortcut, tools, docs and comments renamed; GitHub repo renamed; workflow repo key renamed; the owner renames the Windows folder. | — |
 | GGC-T21 | 2026-10-19 | chore | wont-do | Convert tracked source files to LF line endings via .gitattributes, per HOUSE-LAW-13 (low priority) | — |
-| GGC-T22 | 2026-10-20 | docs | open | Publish TownWalker docs to GitHub Pages via the shared Agency DocFX pipeline: run adopt-docs-site.ps1 (README.md as home page, docs/*.md as articles, API reference only where the code builds in CI), enable Pages with build_type=workflow, set the repo homepage URL, retire tools/build-readme.ps1 and README.htm, confirm the docs Actions run is green and https://mindattic.github.io/TownWalker/ returns 200. Depends on MAT-T8. | — |
+| GGC-T22 | 2026-10-20 | docs | closed | Publish TownWalker docs to GitHub Pages via the shared Agency DocFX pipeline: run adopt-docs-site.ps1 (README.md as home page, docs/*.md as articles, API reference only where the code builds in CI), enable Pages with build_type=workflow, set the repo homepage URL, retire tools/build-readme.ps1 and README.htm, confirm the docs Actions run is green and https://mindattic.github.io/TownWalker/ returns 200. Depends on MAT-T8. | — |
 | GGC-T23 | 2026-10-20 | chore | closed | Update deploy.ps1 comment's sibling-repo reference from UnityEve to its new name Unity.Eve (Unity Fleet Rename) | deploy.ps1 comment text update |
 | GGC-T24 | 2026-10-22 | docs | closed | Update USER_STORIES.md | — |
 | GGC-T25 | 2026-10-24 | docs | closed | Update USER_STORIES.md | — |
 | GGC-T26 | 2026-10-27 | fix | closed | Fix Desktop shortcut icon path: points at nonexistent C:\Apps\TownWalker\TownWalker.exe | tools/run.ps1@2e03be4 |
 | GGC-T27 | 2026-10-27 | docs | closed | Update USER_STORIES.md | — |
-| GGC-T28 | 2026-11-02 | docs | open | Adopt MindAttic.Agency docs-site pipeline, publish README to GitHub Pages (HOUSE-LAW-14) | — |
+| GGC-T28 | 2026-11-02 | docs | closed | Adopt MindAttic.Agency docs-site pipeline, publish README to GitHub Pages (HOUSE-LAW-14) | — |
 | GGC-T29 | 2026-11-02 | fix | closed | Bughunt sweep, two passes: find and fix real bugs across tracked source (user request 2026-11-02) | — |
 | GGC-T30 | 2026-11-02 | fix | closed | Command pointer in .agent/commands said a literal $source instead of its legacy path (install.ps1 escaping bug fixed in MAT-T84); point it at the real source, or the global command when the project copy is gone | — |
 | GGC-T31 | 2026-11-02 | fix | closed | Fix the open items the 2026-11-02 bughunt left for decision (build.ps1 -Target Android, stale harness.py commands, track tools/point.png.meta, 3D drag not a tap) | — |
 | GGC-T32 | 2026-11-06 | feature | closed | Adopt the shared off-by-default --headless launch mode (Unity.Shared) | f41e997 |
 | GGC-T33 | 2026-11-10 | chore | closed | Crash recovery: commit the command-catalog sync (.agent/commands/*.md) and regenerated docs/USER_STORIES.md left uncommitted by the session crash | — |
 | GGC-T34 | 2026-11-10 | chore | closed | Crash recovery: commit the command-catalog sync (.agent/commands/*.md) and regenerated docs/USER_STORIES.md left uncommitted by the session crash | — |
-| GGC-T35 | 2026-11-10 | chore | open | Crash recovery / fleet sync: commit the regenerated docs/USER_STORIES.md left uncommitted after other tickets closed elsewhere | — |
+| GGC-T35 | 2026-11-10 | chore | closed | Crash recovery / fleet sync: commit the regenerated docs/USER_STORIES.md left uncommitted after other tickets closed elsewhere | — |
+| GGC-T36 | 2026-11-10 | chore | closed | Adopt the shared docs-site pipeline: turn on GitHub Pages | — |
+| GGC-T37 | 2026-11-17 | docs | closed | Update USER_STORIES.md | — |
