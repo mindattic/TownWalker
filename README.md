@@ -41,6 +41,6 @@ The owner's mood board is a style reference only.
 
 ## Capture
 
-[MindAttic.Capture](../MindAttic.Capture) auto-starts in Editor Play sessions and development
+[MindAttic.Media.Capture](../MindAttic.Media.Capture) auto-starts in Editor Play sessions and development
 builds (not gated by `-capture`). Currently disabled project-wide: `"enabled": false` in
 `Assets/StreamingAssets/capture.json`. Flip it to `true` (or remove the key) to re-enable.
