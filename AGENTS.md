@@ -26,11 +26,12 @@ powershell -File tools/build.ps1                       # Windows dev build -> Bu
 python tools/labcheck.py [demo ...]                    # plays each demo's loop, screenshots -> artifacts/labcheck
 dotnet test Tests/Core.Tests                           # the engine-free core (world, town, routing, hex)
 python tools/make_lab_icons.py                         # pixel icons (game-icons.net, CC BY 3.0)
-run.bat  /  powershell -File tools/run.ps1              # release build -> publish to C:\Apps\TownWalker, refresh Desktop shortcut
+run.bat  /  powershell -File run.ps1                    # menu: 1 Redeploy, 2 Run Debug, 3 Run Release (13 = Deploy & Run)
 ```
-`/deploy` and `/run` are project-owned commands (`.claude/commands/`) that run `tools/run.ps1`
-and launch `C:\Apps\TownWalker\TownWalker.exe` directly — mechanical utilities, not
-project work, so they run instantly with no ticket or pace-gate hold.
+`run.ps1` is the MindAttic standard launcher (`Invoke-AppRun`, kind unity): it deploys to
+`R:\MindAttic\Apps\TownWalker\Debug` and `\Release`. `/deploy` and `/run` are project-owned commands
+(`.claude/commands/`) that run `run.ps1 -Redeploy` and `run.ps1 -RunRelease` — mechanical
+utilities, not project work, so they run instantly with no ticket or pace-gate hold.
 
 ## Map
 - `Assets/Lab/Core` — engine-free model (world, town, routing, hex) backing every demo

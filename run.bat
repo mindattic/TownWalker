@@ -1,29 +1,18 @@
 @echo off
-rem Asks first: 1) Deploy & Run builds the Windows release player, publishes it to
-rem C:\Apps\TownWalker (refreshing the "TownWalker" Desktop shortcut) and launches it;
-rem 2) Run just launches the copy already in C:\Apps\TownWalker. See tools\run.ps1.
-setlocal
-set "EXE=C:\Apps\TownWalker\TownWalker.exe"
-echo.
-echo   TownWalker
-echo     1^) Deploy ^& Run
-echo     2^) Run
-echo.
-choice /c 12 /n /m "  Choose 1 or 2: "
-if errorlevel 2 goto run
-
-:deploy
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\run.ps1" -Launch %*
-if errorlevel 1 (
-    echo   Deploy failed; launching the installed copy instead.
-    if exist "%EXE%" start "" "%EXE%"
+rem The MindAttic standard run.bat (MAT-T279), written by deploy-lib.ps1's Write-RunBat - edits here are overwritten.
+rem Double-click: the run.ps1 menu (1 Redeploy, 2 Run Debug, 3 Run Release). Arguments pass through to run.ps1.
+title TownWalker
+set "RUN_PS1=%~dp0run.ps1"
+if not exist "%RUN_PS1%" (
+    echo run.ps1 not found at "%RUN_PS1%".
     pause
+    exit /b 1
 )
-exit /b
-
-:run
-if not exist "%EXE%" (
-    echo   Nothing is deployed to C:\Apps\TownWalker yet; deploying first.
-    goto deploy
+powershell -NoProfile -ExecutionPolicy Bypass -File "%RUN_PS1%" %*
+if errorlevel 1 (
+    echo.
+    echo run.ps1 failed ^(exit %errorlevel%^).
+    pause
+    exit /b 1
 )
-start "" "%EXE%" %*
+exit /b 0

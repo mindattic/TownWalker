@@ -1,21 +1,20 @@
 ---
-description: Launch the published TownWalker build from C:\Apps.
+description: Launch the deployed TownWalker Release build from R:\MindAttic\Apps.
 argument-hint: ""
 allowed-tools: Read, Bash, PowerShell
 ---
 
 # /run — TownWalker
 
-Project-owned override of the generic `/run` skill: this repo already has a published, standalone
+Project-owned override of the generic `/run` skill: this repo already has a deployed, standalone
 copy — don't search for a launch pattern, just start it:
 
 ```
-Start-Process "C:\Apps\TownWalker\TownWalker.exe"
+powershell -NoProfile -ExecutionPolicy Bypass -File run.ps1 -RunRelease
 ```
 
-If that path is missing, say so and point at `/deploy` (it publishes the copy this launches and
-refreshes the "TownWalker" Desktop shortcut) — don't fall back to running the Unity Editor or
-a dev build instead.
+If nothing is deployed yet, say so and point at `/deploy` (it builds the copy this launches) —
+don't fall back to running the Unity Editor or a dev build instead.
 
 This is a mechanical launch, not project work — it needs no workflow ticket, no orchestrator
 approval, and no pace-gate hold. Run it the instant this command is invoked.
