@@ -28,12 +28,20 @@
     .\run.ps1 -RunRelease                       Run: the installed copy, no build
     .\run.ps1 -Redeploy -RunRelease             Deploy & Run
     .\run.ps1 -Redeploy -DryRun  print what would be built and launched, do nothing
+    .\run.ps1 -Headless                         the installed Release copy with no window (scripted testing)
+    .\run.ps1 -Redeploy -Headless               redeploy first, then the same
+
+.PARAMETER Headless
+    Run R:\MindAttic\Apps\TownWalker\Release\TownWalker.exe with no window through ..\Unity.Shared\tools\Start-Headless.ps1
+    (--headless -batchmode -nographics), wait for its MINDATTIC_HEADLESS_READY log line and exit with that script's code
+    (GGC-T32). With -Redeploy it deploys first. Extra arguments pass through to the player.
 #>
 param(
     [switch]$Redeploy,
     [switch]$RunDebug,
     [switch]$RunRelease,
     [switch]$DryRun,
+    [switch]$Headless,
     [Parameter(ValueFromRemainingArguments = $true)][string[]]$AppArgs = @()
 )
 $ErrorActionPreference = 'Stop'
@@ -46,7 +54,17 @@ $Override = @{
     # DebugArgs   = @('--dev')                  # always passed to Run Debug, before the pass-through arguments
     # ReleaseArgs = @()                         # keep empty for a true standalone run
     # PreBuild    = { param($Config, $Out) }    # or a cmd.exe line with {config} and {out}
-    # PostBuild   = 'copy /y extra.json "{out}"'
+    # The Desktop shortcut opens run.bat's menu, with the Release exe's icon.
+    PostBuild   = {
+        param($Config, $Out)
+        if ($Config -ne 'Release') { return }
+        $link = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'TownWalker.lnk'))
+        $link.TargetPath       = Join-Path $PSScriptRoot 'run.bat'
+        $link.WorkingDirectory = $PSScriptRoot
+        $link.IconLocation     = "$(Join-Path $Out 'TownWalker.exe'),0"
+        $link.Description      = 'TownWalker: 1 Redeploy, 2 Run Debug, 3 Run Release'
+        $link.Save()
+    }
     # Configs     = @('Debug', 'Release')       # which configs Redeploy builds
     # Plan        = @{ Kind = 'dotnet'; Projects = @("$PSScriptRoot\src\MyApp\MyApp.csproj") }
 }
@@ -67,5 +85,18 @@ function Find-DeployLib {
 }
 
 . (Find-DeployLib)
+
+if ($Headless) {
+    if ($Redeploy) { Invoke-AppRun -Repo $PSScriptRoot -Redeploy -DryRun:$DryRun -Override $Override }
+    $release = Get-DeployTarget -RepoName 'TownWalker' -Config Release
+    $exe = Join-Path $release 'TownWalker.exe'
+    if ($DryRun) { Write-Host "  would run headless: `"$exe`" $($AppArgs -join ' ')" -ForegroundColor Yellow; return }
+    if (-not (Test-Path -LiteralPath $exe)) { throw "No Release build of TownWalker in $release; run .\run.ps1 -Redeploy -Headless." }
+    $headlessArgs = @{ Exe = $exe; Wait = $true }
+    if ($AppArgs.Count) { $headlessArgs.GameArgs = $AppArgs }
+    & (Join-Path $PSScriptRoot '..\Unity.Shared\tools\Start-Headless.ps1') @headlessArgs
+    exit $LASTEXITCODE
+}
+
 Invoke-AppRun -Repo $PSScriptRoot -Redeploy:$Redeploy -RunDebug:$RunDebug -RunRelease:$RunRelease -DryRun:$DryRun `
     -AppArgs $AppArgs -Override $Override

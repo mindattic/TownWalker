@@ -1,20 +1,21 @@
 <#
 .SYNOPSIS
-  Deploys the current Release build to C:\Apps\TownWalker, then offers Normal Play, Demo +
-  Capture, or Quit.
+  Deploys the current build to R:\MindAttic\Apps\TownWalker, then offers Normal Play, Demo +
+  Capture, or Quit, run from the Release copy.
 .NOTES
-  Always redeploys from source first (tools\run.ps1), so this never runs a stale build.
+  Always redeploys from source first (the repo-root run.ps1 -Redeploy), so this never runs a stale build.
   Requires the Unity Editor closed for this project.
 #>
 $ErrorActionPreference = "Stop"
 
-& (Join-Path $PSScriptRoot "run.ps1")
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Deploy failed (exit $LASTEXITCODE); not launching." -ForegroundColor Red
-    exit $LASTEXITCODE
+try {
+    & (Join-Path $PSScriptRoot "..\run.ps1") -Redeploy
+} catch {
+    Write-Host "Deploy failed ($_); not launching." -ForegroundColor Red
+    exit 1
 }
 
-$exe = "C:\Apps\TownWalker\TownWalker.exe"
+$exe = "R:\MindAttic\Apps\TownWalker\Release\TownWalker.exe"
 if (-not (Test-Path $exe)) {
     Write-Host "Deploy reported success but $exe is missing." -ForegroundColor Red
     exit 1
